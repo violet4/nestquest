@@ -1,10 +1,18 @@
 import { Property } from "../types";
 
-function PropertyItem({ property }: { property: Property }) {
+interface PropertyItemProps {
+  property: Property;
+  onEdit: () => void;
+  onDelete: () => void;
+  isEditing: boolean;
+}
+
+function PropertyItem({ property, onEdit, onDelete, isEditing }: PropertyItemProps) {
   return (
     <li>
       {property.name} ({property.address})
-      {/* Add edit/delete buttons here, triggering actions in parent component */}
+      <button onClick={onEdit} disabled={isEditing}>Edit</button>
+      <button onClick={onDelete}>Delete</button>
     </li>
   );
 }

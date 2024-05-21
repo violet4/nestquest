@@ -10,3 +10,5 @@ const api = axios.create({
 export const getProperties = () => api.get("/");
 export const getProperty = (id: number) => api.get(`/${id}`);
 export const addProperty = (property: Property) => api.post("/", property);
+export const updateProperty = (id: number, property: Property) => api.put(`/${id}`, property);
+export const deleteProperty = (id: number) => api.delete(`/${id}`);

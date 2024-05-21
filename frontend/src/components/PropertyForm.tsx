@@ -1,9 +1,15 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { AC, ForRentPurchase, Heater, Internet, Property } from "../types";
-import { addProperty } from "../api"; // Assuming you have an api function for POST
+import { addProperty } from "../api";
 
-function PropertyForm({ onAdd }: { onAdd: (property: Property) => void }) {
-  const [newProperty, setNewProperty] = useState<Property>({
+interface PropertyFormProps {
+  propertyToEdit?: Property | null;
+  onCancel: () => void;
+  onSave: (property: Property) => void;
+}
+
+function PropertyForm({ propertyToEdit, onCancel, onSave }: PropertyFormProps) {
+  const initialProperty: Property = {
     id: 0, // Placeholder ID, will be replaced by the server
     name: "",
     address: "",
@@ -35,7 +41,14 @@ function PropertyForm({ onAdd }: { onAdd: (property: Property) => void }) {
     move_in: 0,
     manager: "",
     contact: "",
-  });
+  };
+  const [newProperty, setNewProperty] = useState<Property>(
+    propertyToEdit || initialProperty
+  );
+
+  useEffect(() => {
+    setNewProperty(propertyToEdit || initialProperty);
+  }, [propertyToEdit]);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -50,7 +63,7 @@ function PropertyForm({ onAdd }: { onAdd: (property: Property) => void }) {
     e.preventDefault();
     try {
       const addedProperty = await addProperty(newProperty);
-      onAdd(addedProperty.data);
+      // onAdd(addedProperty.data);
       setNewProperty({
         id: 0, // Placeholder ID, will be replaced by the server
         name: "",
