@@ -4,15 +4,15 @@ interface PropertyItemProps {
   property: Property;
   onEdit: () => void;
   onDelete: () => void;
-  isEditing: boolean;
+  disabled: boolean;
 }
 
-function PropertyItem({ property, onEdit, onDelete, isEditing }: PropertyItemProps) {
+function PropertyItem({ property, onEdit, onDelete, disabled }: PropertyItemProps) {
   return (
     <li>
       {property.name} ({property.address})
-      <button onClick={onEdit} disabled={isEditing}>Edit</button>
-      <button onClick={onDelete}>Delete</button>
+      <button onClick={onEdit} disabled={disabled}>Edit</button>
+      <button onClick={onDelete} disabled={disabled}>Delete</button>
     </li>
   );
 }

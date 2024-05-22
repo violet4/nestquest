@@ -1,16 +1,15 @@
 import React, { useState, useEffect } from "react";
 import { AC, ForRentPurchase, Heater, Internet, Property } from "../types";
-import { addProperty } from "../api";
+import { addProperty, updateProperty } from "../api";
 
 interface PropertyFormProps {
-  propertyToEdit?: Property | null;
+  property: Property | null;
   onCancel: () => void;
-  onSave: (property: Property) => void;
 }
 
-function PropertyForm({ propertyToEdit, onCancel, onSave }: PropertyFormProps) {
+function PropertyForm({ property, onCancel }: PropertyFormProps) {
   const initialProperty: Property = {
-    id: 0, // Placeholder ID, will be replaced by the server
+    id: 0,
     name: "",
     address: "",
     zip: "",
@@ -42,13 +41,13 @@ function PropertyForm({ propertyToEdit, onCancel, onSave }: PropertyFormProps) {
     manager: "",
     contact: "",
   };
-  const [newProperty, setNewProperty] = useState<Property>(
-    propertyToEdit || initialProperty
-  );
+  const [newProperty, setNewProperty] = useState<Property>(initialProperty);
 
   useEffect(() => {
-    setNewProperty(propertyToEdit || initialProperty);
-  }, [propertyToEdit]);
+    if (property) {
+      setNewProperty(property);
+    }
+  }, [property]);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -58,47 +57,19 @@ function PropertyForm({ propertyToEdit, onCancel, onSave }: PropertyFormProps) {
     const newValue = type === 'checkbox' ? checked : value;
     setNewProperty({ ...newProperty, [name]: newValue });
   };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    const fn = property !== null ? updateProperty : setNewProperty;
     try {
-      const addedProperty = await addProperty(newProperty);
-      // onAdd(addedProperty.data);
-      setNewProperty({
-        id: 0, // Placeholder ID, will be replaced by the server
-        name: "",
-        address: "",
-        zip: "",
-        state: "",
-        city: "",
-        county: "",
-        for_rent_purchase: ForRentPurchase.RENT,
-        bedrooms: 0,
-        bathrooms: 0,
-        studio: true,
-        square_feet: 0,
-        cat_friendly: true,
-        dog_friendly: true,
-        washer_dryer: true,
-        ac: AC.CENTRAL,
-        garage: 0,
-        parking: 0,
-        street_parking: true,
-        dishwasher: true,
-        microwave: true,
-        refrigerator: true,
-        heater: Heater.CENTRAL,
-        internet: Internet.FIBER,
-        rent: 0,
-        pet_fee: 0,
-        security_deposit: 0,
-        pet_deposit: 0,
-        move_in: 0,
-        manager: "",
-        contact: "",
-      });
+      let addedProperty: Property | null;
+      if (fn === updateProperty && property !== null) {
+        addedProperty = await updateProperty(property.id, newProperty).then(res => res.data);
+      }
+      else {
+        addedProperty = await addProperty(newProperty).then(res => res.data);
+      }
+      setNewProperty(initialProperty);
     } catch (error) {
-      // Handle errors (display an error message, etc.)
       console.error("Error adding property:", error);
     }
   };
@@ -365,8 +336,15 @@ function PropertyForm({ propertyToEdit, onCancel, onSave }: PropertyFormProps) {
           </label>
         </li>
       </ul>
+
+      {property && (
+        <button type="button" onClick={onCancel}>
+          Cancel
+        </button>
+      )}
+
+      <button type="submit">{property ? 'Update Property' : 'Add Property'}</button>
 {/* for_rent_purchase ac heater internet   */}
-      <button type="submit">Add Property</button>
     </form>
   );
 }
